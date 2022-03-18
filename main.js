@@ -19,8 +19,8 @@ document.body.appendChild(renderer.domElement);
 
 const controls = new OrbitControls( camera, renderer.domElement );
 
-camera.position.set(0,5,2)
-controls.update();
+camera.position.set(-4,3,-10); // Set position like this
+camera.lookAt(new THREE.Vector3(0,0,0)); // Set look at coordinate like thiscontrols.update();
 
 const loader = new GLTFLoader();
 
