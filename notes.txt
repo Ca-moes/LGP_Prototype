@@ -1,0 +1,15 @@
+driver:
+width: 1.8
+height: 2.1
+depth: 0.8
+x: 0
+y: 0
+z: -5
+
+front wheels:
+width: 2.2
+height: 0.3
+depth: 2.3
+x: 0
+y: -1
+z: -4

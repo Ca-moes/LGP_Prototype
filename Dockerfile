@@ -1,16 +1,6 @@
-FROM node:lts-gallium
-
-WORKDIR /app
-
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-
-ADD . .
-
-RUN npm config set unsafe-perm true
-
+FROM node:lts
+WORKDIR /root
+COPY package*.json ./
 RUN npm install
-
-ENTRYPOINT ["/entrypoint.sh"]
-
+COPY . .
 CMD ["npm", "run", "dev"]
