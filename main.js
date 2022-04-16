@@ -3,6 +3,7 @@ import * as dat from 'dat.gui';
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
 import Stats from 'three/examples/jsm/libs/stats.module'
+import { Material } from "three";
 
 let camera, scene, renderer, controls, stats, gui;
 
@@ -25,6 +26,26 @@ let world = {
     y: -1,
     z: -4
   },
+  light1: {
+    object: null,
+    on: true,
+    x: -4.0,
+    y: 2.0,
+    z: -8.0,
+    intensity: 1.0,
+    distance: 100.0,
+    decay: 1.0,
+  },
+  light2: {
+    object: null,
+    on: true,
+    x: 4.0,
+    y: 2.0,
+    z: -8.0,
+    intensity: 1.0,
+    distance: 100.0,
+    decay: 1.0,
+  }
 };
 const pointer = new THREE.Vector2();
 
@@ -48,14 +69,38 @@ function generateDriver(){
   world.driver_select.mesh.position.z = world.driver_select.z 
 }
 
-function init() {
+function updateLight(light){
+  world[light].object.visible = world[light].on
+  world[light].object.position.x = world[light].x
+  world[light].object.position.y = world[light].y
+  world[light].object.position.z = world[light].z
+  world[light].object.intensity = world[light].intensity
+  world[light].object.distance = world[light].distance
+  world[light].object.decay = world[light].decay
+}
+
+function initGui(){
   gui = new dat.GUI()
-  gui.add(world.wheel_select, 'width', 0.1, 5).onChange(generateWheel)
-  gui.add(world.wheel_select, 'height', 0.1, 5).onChange(generateWheel)
-  gui.add(world.wheel_select, 'depth', 0.1, 5).onChange(generateWheel)
-  gui.add(world.wheel_select, 'x', -10.0, 10.0).onChange(generateWheel)
-  gui.add(world.wheel_select, 'y', -10.0, 10.0).onChange(generateWheel)
-  gui.add(world.wheel_select, 'z', -10.0, 10.0).onChange(generateWheel)
+  for (const l of ['light1', 'light2']){
+    const temp_gui = gui.addFolder(l)
+    temp_gui.add(world[l], 'on').onChange(() => updateLight(l))
+    temp_gui.add(world[l], 'x', -20, 20).onChange(() => updateLight(l))
+    temp_gui.add(world[l], 'y', -20, 20).onChange(() => updateLight(l))
+    temp_gui.add(world[l], 'z', -20, 20).onChange(() => updateLight(l))
+    temp_gui.add(world[l], 'intensity', 0, 10).onChange(() => updateLight(l))
+    temp_gui.add(world[l], 'distance', 0.001, 200).onChange(() => updateLight(l))
+  }
+
+  // gui.add(world.wheel_select, 'width', 0.1, 5).onChange(generateWheel)
+  // gui.add(world.wheel_select, 'height', 0.1, 5).onChange(generateWheel)
+  // gui.add(world.wheel_select, 'depth', 0.1, 5).onChange(generateWheel)
+  // gui.add(world.wheel_select, 'x', -10.0, 10.0).onChange(generateWheel)
+  // gui.add(world.wheel_select, 'y', -10.0, 10.0).onChange(generateWheel)
+  // gui.add(world.wheel_select, 'z', -10.0, 10.0).onChange(generateWheel)
+}
+
+function init() {
+  initGui()
 
   // Initial setup
   scene = new THREE.Scene();
@@ -96,7 +141,7 @@ function init() {
   // Train model
   const loader = new GLTFLoader();
   loader.load(
-    "models/train_1/comboio3400_final.glb",
+    "models/train_1/train.glb",
     function (gltf) {
       let train = gltf.scene;
       train.rotateY(-Math.PI/2)
@@ -112,15 +157,21 @@ function init() {
     }
   );
   
-  // // Point Light
-  // const light = new THREE.PointLight(0xffffff, 1, 100)
-  // light.position.set(-4,2,-8)
-  // scene.add(light)
-  // scene.add( new THREE.PointLightHelper( light, 0.1 ) );
+  // Point Light1
+  world.light1.object = new THREE.PointLight(0xffffff, world.light1.intensity, world.light1.distance, world.light1.decay)
+  world.light1.object.position.set(world.light1.x,world.light1.y,world.light1.z)
+  scene.add(world.light1.object)
+  scene.add( new THREE.PointLightHelper( world.light1.object, 0.01 ) );
+
+  // Point Light2
+  world.light2.object = new THREE.PointLight(0xffffff, world.light2.intensity, world.light2.distance, world.light2.decay)
+  world.light2.object.position.set(world.light2.x,world.light2.y,world.light2.z)
+  scene.add(world.light2.object)
+  scene.add( new THREE.PointLightHelper( world.light2.object, 0.01 ) );
 
   // Ambient Light
-  const light = new THREE.AmbientLight('white', 1);
-  scene.add(light)
+  const ambientLight = new THREE.AmbientLight('white', 0.3);
+  scene.add(ambientLight)
 
 
   // FPS
