@@ -80,25 +80,29 @@ function init() {
   camera.lookAt(new THREE.Vector3(0,0,0)); // Set look at coordinate like thiscontrols.update();
   
   // wheel_select
-  const geometry = new THREE.BoxGeometry(world.wheel_select.width, world.wheel_select.height, world.wheel_select.depth)
-  const material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
-  world.wheel_select.mesh = new THREE.Mesh( geometry, material );
-  scene.add( world.wheel_select.mesh );
-  generateWheel()
+  // const geometry = new THREE.BoxGeometry(world.wheel_select.width, world.wheel_select.height, world.wheel_select.depth)
+  // const material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
+  // world.wheel_select.mesh = new THREE.Mesh( geometry, material );
+  // scene.add( world.wheel_select.mesh );
+  // generateWheel()
 
   // driver_select
-  const geometry_driver = new THREE.BoxGeometry(world.driver_select.width, world.driver_select.height, world.driver_select.depth)
-  world.driver_select.mesh = new THREE.Mesh( geometry, material );
-  scene.add( world.driver_select.mesh );
-  generateDriver()
+  // const geometry_driver = new THREE.BoxGeometry(world.driver_select.width, world.driver_select.height, world.driver_select.depth)
+  // world.driver_select.mesh = new THREE.Mesh( geometry, material );
+  // scene.add( world.driver_select.mesh );
+  // generateDriver()
 
 
   // Train model
   const loader = new GLTFLoader();
   loader.load(
-    "models/train/scene.gltf",
+    "models/train_1/comboio3400_final.glb",
     function (gltf) {
-      scene.add(gltf.scene);
+      let train = gltf.scene;
+      train.rotateY(-Math.PI/2)
+      train.position.z = -15
+      train.scale.set(2, 2, 2)
+      scene.add(train);
     },
     function (xhr) {
       console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
@@ -108,11 +112,16 @@ function init() {
     }
   );
   
-  // Light
-  const light = new THREE.PointLight(0xffffff, 1, 100)
-  light.position.set(-4,2,-8)
+  // // Point Light
+  // const light = new THREE.PointLight(0xffffff, 1, 100)
+  // light.position.set(-4,2,-8)
+  // scene.add(light)
+  // scene.add( new THREE.PointLightHelper( light, 0.1 ) );
+
+  // Ambient Light
+  const light = new THREE.AmbientLight('white', 1);
   scene.add(light)
-  scene.add( new THREE.PointLightHelper( light, 0.1 ) );
+
 
   // FPS
   stats = Stats()
